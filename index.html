@@ -11,7 +11,35 @@
 </head>
 <body>
   <div class="page">
-    <div class="app">
+
+    <div class="auth-wrap" id="authScreen">
+      <div class="card auth-card">
+        <h1 class="auth-title"><span class="emoji">💰</span> 나의 가계부</h1>
+        <p class="auth-sub">로그인하고 내 가계부 데이터를 안전하게 저장하세요</p>
+
+        <form id="authForm">
+          <div class="field-row">
+            <label for="authEmail">이메일</label>
+            <input type="email" id="authEmail" placeholder="you@example.com" required autocomplete="email">
+          </div>
+          <div class="field-row">
+            <label for="authPassword">비밀번호</label>
+            <input type="password" id="authPassword" placeholder="6자 이상" minlength="6" required autocomplete="current-password">
+          </div>
+          <p class="auth-error" id="authError"></p>
+          <button type="submit" class="submit-btn" id="authSubmitBtn">로그인</button>
+        </form>
+
+        <button type="button" class="auth-toggle" id="authToggleMode">계정이 없으신가요? 회원가입</button>
+      </div>
+    </div>
+
+    <div class="app" id="appRoot" hidden>
+
+      <div class="topbar">
+        <span class="user-email" id="userEmail"></span>
+        <button type="button" class="logout-btn" id="logoutBtn">로그아웃</button>
+      </div>
 
       <header class="app-header">
         <p class="eyebrow" id="todayDate"></p>
@@ -73,7 +101,7 @@
               <input type="text" id="memo" placeholder="선택 사항">
             </div>
 
-            <button type="submit" class="submit-btn">추가하기</button>
+            <button type="submit" class="submit-btn" id="submitBtn">추가하기</button>
           </form>
         </div>
 
@@ -111,6 +139,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,4 +1,6 @@
-const STORAGE_KEY = "house-account-entries";
+const SUPABASE_URL = "https://qocramaysblhgfrmwryd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_qHyopzrP8MVN1bBUAc294A_b55PSHnQ";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const CATEGORY_ICONS = [
   { keywords: ["식비", "식사", "음식", "밥", "카페", "커피"], icon: "🍔" },
@@ -21,7 +23,21 @@ const QUICK_CATEGORIES = {
 
 const CHART_COLORS = ["#a855f7", "#22d3ee", "#f43f5e", "#fbbf24", "#34d399", "#818cf8", "#f472b6", "#2dd4bf"];
 
+// Auth elements
+const authScreen = document.getElementById("authScreen");
+const authForm = document.getElementById("authForm");
+const authEmailInput = document.getElementById("authEmail");
+const authPasswordInput = document.getElementById("authPassword");
+const authError = document.getElementById("authError");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const authToggleMode = document.getElementById("authToggleMode");
+const appRoot = document.getElementById("appRoot");
+const userEmailEl = document.getElementById("userEmail");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// App elements
 const form = document.getElementById("entryForm");
+const submitBtn = document.getElementById("submitBtn");
 const typeToggle = document.getElementById("typeToggle");
 const typeInput = document.getElementById("type");
 const dateInput = document.getElementById("date");
@@ -43,6 +59,7 @@ const emptyChart = document.getElementById("emptyChart");
 const todayDateEl = document.getElementById("todayDate");
 
 let currentFilter = "all";
+let authMode = "login";
 const prevTotals = { income: 0, expense: 0, balance: 0 };
 
 dateInput.valueAsDate = new Date();
@@ -53,13 +70,20 @@ todayDateEl.textContent = new Date().toLocaleDateString("ko-KR", {
   weekday: "long",
 });
 
-function loadEntries() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveEntries(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+async function loadEntries() {
+  const { data, error } = await sb.from("entries").select("*").order("date", { ascending: false });
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data.map((row) => ({
+    id: row.id,
+    date: row.date,
+    type: row.type,
+    category: row.category,
+    amount: Number(row.amount),
+    memo: row.memo || "",
+  }));
 }
 
 function formatWon(n) {
@@ -147,8 +171,8 @@ function renderChart(entries) {
   animateValue(donutTotal, 0, totalExpense, 500);
 }
 
-function render() {
-  const entries = loadEntries().sort((a, b) => b.date.localeCompare(a.date));
+async function render() {
+  const entries = await loadEntries();
 
   const filtered = currentFilter === "all" ? entries : entries.filter((e) => e.type === currentFilter);
 
@@ -216,19 +240,23 @@ filterTabs.addEventListener("click", (e) => {
   render();
 });
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const entries = loadEntries();
-  entries.push({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+  submitBtn.disabled = true;
+  const { error } = await sb.from("entries").insert({
     date: dateInput.value,
     type: typeInput.value,
     category: categoryInput.value.trim(),
     amount: Number(amountInput.value),
     memo: memoInput.value.trim(),
   });
-  saveEntries(entries);
+  submitBtn.disabled = false;
+
+  if (error) {
+    alert("저장에 실패했어요: " + error.message);
+    return;
+  }
 
   categoryInput.value = "";
   amountInput.value = "";
@@ -244,12 +272,75 @@ entryList.addEventListener("click", (e) => {
 
   const row = btn.closest(".entry-row");
   row.classList.add("removing");
-  setTimeout(() => {
-    const entries = loadEntries().filter((entry) => entry.id !== btn.dataset.id);
-    saveEntries(entries);
+  setTimeout(async () => {
+    const { error } = await sb.from("entries").delete().eq("id", btn.dataset.id);
+    if (error) console.error(error);
     render();
   }, 180);
 });
 
+// Auth
+
+function setAuthMode(mode) {
+  authMode = mode;
+  authError.textContent = "";
+  authError.classList.remove("info");
+  if (mode === "login") {
+    authSubmitBtn.textContent = "로그인";
+    authToggleMode.textContent = "계정이 없으신가요? 회원가입";
+  } else {
+    authSubmitBtn.textContent = "회원가입";
+    authToggleMode.textContent = "이미 계정이 있으신가요? 로그인";
+  }
+}
+
+authToggleMode.addEventListener("click", () => {
+  setAuthMode(authMode === "login" ? "signup" : "login");
+});
+
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  authError.textContent = "";
+  authError.classList.remove("info");
+  authSubmitBtn.disabled = true;
+
+  const email = authEmailInput.value.trim();
+  const password = authPasswordInput.value;
+
+  try {
+    if (authMode === "login") {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) throw error;
+      if (!data.session) {
+        authError.textContent = "가입 확인 메일을 보냈어요. 메일함을 확인한 후 로그인해주세요.";
+        authError.classList.add("info");
+      }
+    }
+  } catch (err) {
+    authError.textContent = err.message || "오류가 발생했어요.";
+  } finally {
+    authSubmitBtn.disabled = false;
+  }
+});
+
+logoutBtn.addEventListener("click", () => {
+  sb.auth.signOut();
+});
+
+sb.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    authScreen.hidden = true;
+    appRoot.hidden = false;
+    userEmailEl.textContent = session.user.email;
+    render();
+  } else {
+    appRoot.hidden = true;
+    authScreen.hidden = false;
+  }
+});
+
 renderQuickChips();
-render();
