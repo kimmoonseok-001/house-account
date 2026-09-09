@@ -19,7 +19,7 @@ const QUICK_CATEGORIES = {
   income: ["월급", "용돈", "저축", "기타"],
 };
 
-const CHART_COLORS = ["#6366f1", "#f43f5e", "#f59e0b", "#10b981", "#0ea5e9", "#a855f7", "#ec4899", "#14b8a6"];
+const CHART_COLORS = ["#a855f7", "#22d3ee", "#f43f5e", "#fbbf24", "#34d399", "#818cf8", "#f472b6", "#2dd4bf"];
 
 const form = document.getElementById("entryForm");
 const typeToggle = document.getElementById("typeToggle");
