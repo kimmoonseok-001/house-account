@@ -23,18 +23,6 @@ const QUICK_CATEGORIES = {
 
 const CHART_COLORS = ["#a855f7", "#22d3ee", "#f43f5e", "#fbbf24", "#34d399", "#818cf8", "#f472b6", "#2dd4bf"];
 
-// Auth elements
-const authScreen = document.getElementById("authScreen");
-const authForm = document.getElementById("authForm");
-const authEmailInput = document.getElementById("authEmail");
-const authPasswordInput = document.getElementById("authPassword");
-const authError = document.getElementById("authError");
-const authSubmitBtn = document.getElementById("authSubmitBtn");
-const authToggleMode = document.getElementById("authToggleMode");
-const appRoot = document.getElementById("appRoot");
-const userEmailEl = document.getElementById("userEmail");
-const logoutBtn = document.getElementById("logoutBtn");
-
 // App elements
 const form = document.getElementById("entryForm");
 const submitBtn = document.getElementById("submitBtn");
@@ -59,7 +47,6 @@ const emptyChart = document.getElementById("emptyChart");
 const todayDateEl = document.getElementById("todayDate");
 
 let currentFilter = "all";
-let authMode = "login";
 const prevTotals = { income: 0, expense: 0, balance: 0 };
 
 dateInput.valueAsDate = new Date();
@@ -279,68 +266,5 @@ entryList.addEventListener("click", (e) => {
   }, 180);
 });
 
-// Auth
-
-function setAuthMode(mode) {
-  authMode = mode;
-  authError.textContent = "";
-  authError.classList.remove("info");
-  if (mode === "login") {
-    authSubmitBtn.textContent = "로그인";
-    authToggleMode.textContent = "계정이 없으신가요? 회원가입";
-  } else {
-    authSubmitBtn.textContent = "회원가입";
-    authToggleMode.textContent = "이미 계정이 있으신가요? 로그인";
-  }
-}
-
-authToggleMode.addEventListener("click", () => {
-  setAuthMode(authMode === "login" ? "signup" : "login");
-});
-
-authForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  authError.textContent = "";
-  authError.classList.remove("info");
-  authSubmitBtn.disabled = true;
-
-  const email = authEmailInput.value.trim();
-  const password = authPasswordInput.value;
-
-  try {
-    if (authMode === "login") {
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } else {
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) throw error;
-      if (!data.session) {
-        authError.textContent = "가입 확인 메일을 보냈어요. 메일함을 확인한 후 로그인해주세요.";
-        authError.classList.add("info");
-      }
-    }
-  } catch (err) {
-    authError.textContent = err.message || "오류가 발생했어요.";
-  } finally {
-    authSubmitBtn.disabled = false;
-  }
-});
-
-logoutBtn.addEventListener("click", () => {
-  sb.auth.signOut();
-});
-
-sb.auth.onAuthStateChange((_event, session) => {
-  if (session) {
-    authScreen.hidden = true;
-    appRoot.hidden = false;
-    userEmailEl.textContent = session.user.email;
-    render();
-  } else {
-    appRoot.hidden = true;
-    authScreen.hidden = false;
-  }
-});
-
 renderQuickChips();
+render();
