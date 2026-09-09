@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가계부</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <h1>가계부</h1>
+
+    <div class="summary">
+      <div class="summary-box income">
+        <span class="label">수입</span>
+        <span class="amount" id="totalIncome">0원</span>
+      </div>
+      <div class="summary-box expense">
+        <span class="label">지출</span>
+        <span class="amount" id="totalExpense">0원</span>
+      </div>
+      <div class="summary-box balance">
+        <span class="label">잔액</span>
+        <span class="amount" id="totalBalance">0원</span>
+      </div>
+    </div>
+
+    <form id="entryForm">
+      <div class="row">
+        <input type="date" id="date" required>
+        <select id="type">
+          <option value="income">수입</option>
+          <option value="expense">지출</option>
+        </select>
+      </div>
+      <div class="row">
+        <input type="text" id="category" placeholder="카테고리 (예: 식비, 교통)" required>
+        <input type="number" id="amount" placeholder="금액" min="0" required>
+      </div>
+      <div class="row">
+        <input type="text" id="memo" placeholder="메모 (선택)">
+        <button type="submit">추가</button>
+      </div>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>구분</th>
+          <th>카테고리</th>
+          <th>메모</th>
+          <th>금액</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="entryList"></tbody>
+    </table>
+
+    <p class="empty" id="emptyMsg">아직 기록이 없어요. 위에서 첫 항목을 추가해보세요.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

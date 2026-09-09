@@ -1,0 +1,146 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: #f4f5f7;
+  color: #1f2430;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-box {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-box .label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.summary-box .amount {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.summary-box.income .amount { color: #2563eb; }
+.summary-box.expense .amount { color: #dc2626; }
+.summary-box.balance .amount { color: #111827; }
+
+form {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+input, select, button {
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+}
+
+input, select {
+  flex: 1;
+  min-width: 0;
+}
+
+button {
+  background: #111827;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  padding: 10px 20px;
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+th {
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td.amount-income { color: #2563eb; font-weight: 600; }
+td.amount-expense { color: #dc2626; font-weight: 600; }
+
+.del-btn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.del-btn:hover {
+  color: #dc2626;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  margin-top: 20px;
+  font-size: 14px;
+}
